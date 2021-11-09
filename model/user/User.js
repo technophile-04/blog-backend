@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
 
 //create schema
 const userSchema = new mongoose.Schema(
@@ -25,7 +26,7 @@ const userSchema = new mongoose.Schema(
 		},
 		password: {
 			type: String,
-			required: [true, 'Hei buddy Password is required'],
+			required: [true, 'Hey buddy Password is required'],
 		},
 		postCount: {
 			type: Number,
@@ -99,6 +100,16 @@ const userSchema = new mongoose.Schema(
 		timestamps: true,
 	}
 );
+
+// To save the Hashed password we use middleware provided by mongoose and that dont use arrow function coz we want to reference the schema
+// Hashed password
+userSchema.pre('save', async function (next) {
+	// console.log(this);
+	const salt = await bcrypt.genSalt(10);
+	this.password = await bcrypt.hash(this.password, salt);
+
+	next();
+});
 
 //Compile schema into model
 const User = mongoose.model('User', userSchema);
