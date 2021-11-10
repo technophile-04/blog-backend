@@ -1,7 +1,9 @@
 const express = require('express');
 const dotenv = require('dotenv');
+const morgan = require('morgan');
 const dbConnect = require('./config/db/dbConnect');
-const { userRegisterCtrl } = require('./controllers/user/usersCtrl');
+const userRoutes = require('./routes/users/usersRoutes');
+const { errorHandler, notFound } = require('./middlewares/error/errorHandler');
 
 dotenv.config();
 
@@ -11,16 +13,13 @@ const app = express();
 dbConnect();
 
 app.use(express.json());
+app.use(morgan('short'));
 
-// Register
-app.post('/api/users/register', userRegisterCtrl);
+app.use('/api/users', userRoutes);
 
-// Login
-app.post('/api/users/login', (req, res) => {
-	res.json({
-		user: 'User is login',
-	});
-});
+// error handler
+app.use(notFound);
+app.use(errorHandler);
 
 // Server
 const PORT = process.env.PORT || 8080;

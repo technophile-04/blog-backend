@@ -1,12 +1,10 @@
+const asyncHandler = require('express-async-handler');
 const User = require('../../model/user/User');
 
-const userRegisterCtrl = async (req, res) => {
+const userRegisterCtrl = asyncHandler(async (req, res) => {
 	const userExist = await User.findOne({ email: req?.body?.email });
 
-	if (userExist) {
-		res.json({ message: 'User already exists' });
-		return;
-	}
+	if (userExist) throw new Error('User already exists');
 
 	try {
 		const user = await User.create({
@@ -20,6 +18,6 @@ const userRegisterCtrl = async (req, res) => {
 	} catch (error) {
 		res.json({ message: error.message });
 	}
-};
+});
 
 module.exports = { userRegisterCtrl };
