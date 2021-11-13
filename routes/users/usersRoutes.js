@@ -1,15 +1,14 @@
 const express = require('express');
-const { userRegisterCtrl } = require('../../controllers/user/usersCtrl');
+const {
+	userRegisterCtrl,
+	userLoginCtrl,
+} = require('../../controllers/user/usersCtrl');
 
 const userRoutes = express.Router();
 
 userRoutes.post('/register', userRegisterCtrl);
 
 // Login
-userRoutes.post('/login', (req, res) => {
-	res.json({
-		user: 'User is login',
-	});
-});
+userRoutes.post('/login', userLoginCtrl);
 
 module.exports = userRoutes;
