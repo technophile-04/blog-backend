@@ -1,5 +1,7 @@
 const asyncHandler = require('express-async-handler');
 const User = require('../../model/user/User');
+const generateToken = require('../../config/token/generateToken');
+const validateMongoDbId = require('../../utils/validateMongoDbId');
 
 // we keep only bussiness logic here thats why have encryted and decrypted pass in user model file
 
@@ -40,7 +42,51 @@ const userLoginCtrl = asyncHandler(async (req, res) => {
 		throw new Error('Login credentials are not valid');
 	}
 
-	res.json('User logged in');
+	res.json({
+		_id: user?._id,
+		firstName: user?.firstName,
+		lastName: user?.lastName,
+		email: user?.email,
+		profilePhoto: user?.profilePhoto,
+		isAdmin: user?.isAdmin,
+		token: generateToken(user?._id),
+	});
 });
 
-module.exports = { userRegisterCtrl, userLoginCtrl };
+// -----------------------------------------------
+// ALL USERS
+// -----------------------------------------------
+
+const fetchAllUsersCtrl = asyncHandler(async (req, res) => {
+	try {
+		const users = await User.find({});
+		res.json(users);
+	} catch (error) {
+		res.json({ message: error.message });
+	}
+});
+
+// -----------------------------------------------
+// Delete user
+// -----------------------------------------------
+
+const deleteUserCtrl = asyncHandler(async (req, res) => {
+	const { userId } = req.params;
+
+	validateMongoDbId(userId);
+
+	try {
+		const deletedUser = await User.findByIdAndDelete(userId);
+
+		res.json(deletedUser);
+	} catch (error) {
+		res.json({ message: error.message });
+	}
+});
+
+module.exports = {
+	userRegisterCtrl,
+	userLoginCtrl,
+	fetchAllUsersCtrl,
+	deleteUserCtrl,
+};
