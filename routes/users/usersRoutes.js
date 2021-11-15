@@ -4,6 +4,7 @@ const {
 	userLoginCtrl,
 	fetchAllUsersCtrl,
 	deleteUserCtrl,
+	fetchUserDetailsCtrl,
 } = require('../../controllers/user/usersCtrl');
 
 const userRoutes = express.Router();
@@ -19,5 +20,8 @@ userRoutes.get('/', fetchAllUsersCtrl);
 
 // Delete a user
 userRoutes.delete('/:userId', deleteUserCtrl);
+
+// fetch user details
+userRoutes.get('/:userId', fetchUserDetailsCtrl);
 
 module.exports = userRoutes;

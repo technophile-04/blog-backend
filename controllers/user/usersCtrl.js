@@ -84,9 +84,28 @@ const deleteUserCtrl = asyncHandler(async (req, res) => {
 	}
 });
 
+// -----------------------------------------------
+// user details
+// -----------------------------------------------
+
+const fetchUserDetailsCtrl = asyncHandler(async (req, res) => {
+	const { userId } = req.params;
+
+	validateMongoDbId(userId);
+
+	try {
+		const user = await User.findById(userId);
+
+		res.json(user);
+	} catch (error) {
+		res.send({ message: error.message });
+	}
+});
+
 module.exports = {
 	userRegisterCtrl,
 	userLoginCtrl,
 	fetchAllUsersCtrl,
 	deleteUserCtrl,
+	fetchUserDetailsCtrl,
 };
