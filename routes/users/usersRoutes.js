@@ -9,6 +9,8 @@ const {
 
 const userRoutes = express.Router();
 
+const authMiddleware = require('../../middlewares/auth/authMiddleware');
+
 // Register
 userRoutes.post('/register', userRegisterCtrl);
 
@@ -16,7 +18,7 @@ userRoutes.post('/register', userRegisterCtrl);
 userRoutes.post('/login', userLoginCtrl);
 
 // Fetch all  users
-userRoutes.get('/', fetchAllUsersCtrl);
+userRoutes.get('/', authMiddleware, fetchAllUsersCtrl);
 
 // Delete a user
 userRoutes.delete('/:userId', deleteUserCtrl);
