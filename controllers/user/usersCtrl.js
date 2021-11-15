@@ -102,10 +102,66 @@ const fetchUserDetailsCtrl = asyncHandler(async (req, res) => {
 	}
 });
 
+// -----------------------------------------------
+// user profile
+// -----------------------------------------------
+
+const fetchUserProfileCtrl = asyncHandler(async (req, res) => {
+	const { profileId } = req.params;
+
+	validateMongoDbId(profileId);
+
+	try {
+		const userProfile = await User.findById(profileId);
+		res.json(userProfile);
+	} catch (error) {
+		res.json({ message: error.message });
+	}
+});
+
+// -----------------------------------------------
+// update user profile
+// -----------------------------------------------
+
+const updateUserProfileCtrl = asyncHandler(async (req, res) => {
+	// const { userId } = req.params;
+
+	const { _id } = req?.user;
+
+	validateMongoDbId(_id);
+
+	try {
+		const updatedUser = await User.findByIdAndUpdate(
+			_id,
+			{
+				firstName: req?.body?.firstName,
+				lastName: req?.body?.lastName,
+				email: req?.body?.email,
+				bio: req?.body?.bio,
+			},
+			{
+				new: true,
+				runValidators: true,
+			}
+		);
+
+		res.json(updatedUser);
+	} catch (error) {
+		res.json({ message: error.message });
+	}
+
+	/*
+		1)get the id from params
+		2)validate id with the user set on req
+	 */
+});
+
 module.exports = {
 	userRegisterCtrl,
 	userLoginCtrl,
 	fetchAllUsersCtrl,
 	deleteUserCtrl,
 	fetchUserDetailsCtrl,
+	fetchUserProfileCtrl,
+	updateUserProfileCtrl,
 };
