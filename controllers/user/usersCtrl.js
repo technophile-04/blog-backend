@@ -156,6 +156,51 @@ const updateUserProfileCtrl = asyncHandler(async (req, res) => {
 	 */
 });
 
+// -----------------------------------------------
+// update user password
+// -----------------------------------------------
+const updateUserPasswordCtrl = asyncHandler(async (req, res) => {
+	const { _id } = req?.user;
+	const { password } = req.body;
+
+	validateMongoDbId(_id);
+
+	const user = await User.findById(_id);
+
+	if (password) {
+		user.password = password;
+		const updatedUser = await user.save();
+		res.json(updatedUser);
+	} else {
+		throw new Error('Please enter a passwrd');
+	}
+});
+
+// -----------------------------------------------
+// Follow a user
+// -----------------------------------------------
+const followingUserCtrl = asyncHandler(async (req, res) => {
+	// Find the logged in user who want to follow
+	// get the user who will be followed by logged in user
+
+	const { followId } = req.body;
+	const { id } = req.user;
+
+	try {
+		await User.findByIdAndUpdate(followId, {
+			$push: { followers: id },
+		});
+
+		await User.findByIdAndUpdate(id, {
+			$push: { following: followId },
+		});
+
+		res.json('You have successfully followed this user!');
+	} catch (error) {
+		res.json({ message: error.message });
+	}
+});
+
 module.exports = {
 	userRegisterCtrl,
 	userLoginCtrl,
@@ -164,4 +209,6 @@ module.exports = {
 	fetchUserDetailsCtrl,
 	fetchUserProfileCtrl,
 	updateUserProfileCtrl,
+	updateUserPasswordCtrl,
+	followingUserCtrl,
 };

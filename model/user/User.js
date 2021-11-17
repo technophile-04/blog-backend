@@ -104,6 +104,10 @@ const userSchema = new mongoose.Schema(
 // To save the Hashed password we use middleware provided by mongoose and that dont use arrow function coz we want to reference the schema
 // Hashed password
 userSchema.pre('save', async function (next) {
+	if (!this.isModified('password')) {
+		next();
+	}
+
 	// console.log(this);
 	const salt = await bcrypt.genSalt(10);
 	this.password = await bcrypt.hash(this.password, salt);

@@ -7,6 +7,8 @@ const {
 	fetchUserDetailsCtrl,
 	fetchUserProfileCtrl,
 	updateUserProfileCtrl,
+	updateUserPasswordCtrl,
+	followingUserCtrl,
 } = require('../../controllers/user/usersCtrl');
 
 const userRoutes = express.Router();
@@ -24,6 +26,12 @@ userRoutes.get('/', authMiddleware, fetchAllUsersCtrl);
 
 // fetch user profile
 userRoutes.get('/profile/:profileId', authMiddleware, fetchUserProfileCtrl);
+
+// update user password
+userRoutes.put('/password', authMiddleware, updateUserPasswordCtrl);
+
+// following user
+userRoutes.put('/follow', authMiddleware, followingUserCtrl);
 
 // update user profile
 userRoutes.put('/:userId', authMiddleware, updateUserProfileCtrl);
