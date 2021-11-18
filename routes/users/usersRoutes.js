@@ -9,6 +9,7 @@ const {
 	updateUserProfileCtrl,
 	updateUserPasswordCtrl,
 	followingUserCtrl,
+	unfollowUserCtrl,
 } = require('../../controllers/user/usersCtrl');
 
 const userRoutes = express.Router();
@@ -32,6 +33,9 @@ userRoutes.put('/password', authMiddleware, updateUserPasswordCtrl);
 
 // following user
 userRoutes.put('/follow', authMiddleware, followingUserCtrl);
+
+// unFollow user
+userRoutes.put('/unfollow', authMiddleware, unfollowUserCtrl);
 
 // update user profile
 userRoutes.put('/:userId', authMiddleware, updateUserProfileCtrl);
