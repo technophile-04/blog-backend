@@ -10,6 +10,10 @@ const {
 	updateUserPasswordCtrl,
 	followingUserCtrl,
 	unfollowUserCtrl,
+	blockUserCtrl,
+	unBlockUserCtrl,
+	generateVerificationTokenCtrl,
+	accountVerificationCrl,
 } = require('../../controllers/user/usersCtrl');
 
 const userRoutes = express.Router();
@@ -37,8 +41,24 @@ userRoutes.put('/follow', authMiddleware, followingUserCtrl);
 // unFollow user
 userRoutes.put('/unfollow', authMiddleware, unfollowUserCtrl);
 
+// block user
+userRoutes.put('/block-user/:id', authMiddleware, blockUserCtrl);
+
+// unblock user
+userRoutes.put('/unblock-user/:id', authMiddleware, unBlockUserCtrl);
+
+// verif account
+userRoutes.put('/verfiy-account', authMiddleware, accountVerificationCrl);
+
 // update user profile
 userRoutes.put('/:userId', authMiddleware, updateUserProfileCtrl);
+
+// send mail
+userRoutes.post(
+	'/generate-verify-email-token',
+	authMiddleware,
+	generateVerificationTokenCtrl
+);
 
 // fetch user details
 userRoutes.get('/:userId', fetchUserDetailsCtrl);

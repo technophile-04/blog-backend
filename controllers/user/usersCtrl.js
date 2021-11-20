@@ -1,7 +1,12 @@
+require('dotenv').config();
 const asyncHandler = require('express-async-handler');
+const crypto = require('crypto');
 const User = require('../../model/user/User');
 const generateToken = require('../../config/token/generateToken');
 const validateMongoDbId = require('../../utils/validateMongoDbId');
+const sgMail = require('@sendgrid/mail');
+
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 // we keep only bussiness logic here thats why have encryted and decrypted pass in user model file
 
@@ -256,6 +261,111 @@ const unfollowUserCtrl = asyncHandler(async (req, res) => {
 	}
 });
 
+// -----------------------------------------------
+// Block a user
+// -----------------------------------------------
+
+const blockUserCtrl = asyncHandler(async (req, res) => {
+	const userId = req.params.id;
+
+	validateMongoDbId(userId);
+
+	try {
+		await User.findByIdAndUpdate(
+			userId,
+			{
+				isBlocked: true,
+			},
+			{ new: true }
+		);
+
+		res.json('This is user is blocked now !');
+	} catch (error) {
+		res.json({ message: error.message });
+	}
+});
+
+// -----------------------------------------------
+// UnBlock a user
+// -----------------------------------------------
+
+const unBlockUserCtrl = asyncHandler(async (req, res) => {
+	const userId = req.params.id;
+
+	validateMongoDbId(userId);
+
+	try {
+		await User.findByIdAndUpdate(
+			userId,
+			{
+				isBlocked: false,
+			},
+			{ new: true }
+		);
+
+		res.json('This user is now unblocked!');
+	} catch (error) {
+		res.json({ message: error.message });
+	}
+});
+
+// -----------------------------------------------
+// Generate email verification Token
+// -----------------------------------------------
+
+const generateVerificationTokenCtrl = asyncHandler(async (req, res) => {
+	const loginUserId = req.user.id;
+
+	try {
+		const user = await User.findById(loginUserId);
+
+		const verificationToken = await user.createAccountVerificationToken();
+
+		await user.save();
+
+		const resetUrl = `If you were requested to verify your account, verify it within 10 minutes, otherwise ignore this message <a href="http://localhost:3000/verify-token/${verificationToken}">Click here to verify</a>`;
+
+		const msg = {
+			to: 'shivbhonde04@gmail.com',
+			from: 'shivbhonde34@gmail.com',
+			subject: 'My first nodejs email sending',
+			html: resetUrl,
+		};
+
+		await sgMail.send(msg);
+		res.json('Email sent');
+	} catch (error) {
+		res.json({ message: error.message });
+	}
+});
+
+// -----------------------------------------------
+// Account Verification
+// -----------------------------------------------
+
+const accountVerificationCrl = asyncHandler(async (req, res) => {
+	const { verificationToken } = req.body;
+	const hashedToken = crypto
+		.createHash('sha256')
+		.update(verificationToken)
+		.digest('hex');
+
+	const userFound = await User.findOne({
+		accountVerificationToken: hashedToken,
+		accountVerificationTokenExpires: { $gt: Date.now() },
+	});
+
+	if (!userFound) throw new Error('Token is expired, please try again!');
+
+	userFound.isAccountVerified = true;
+	userFound.accountVerificationToken = undefined;
+	userFound.accountVerificationTokenExpires = undefined;
+
+	await userFound.save();
+
+	res.json('Congrats you are now a verified user!');
+});
+
 module.exports = {
 	userRegisterCtrl,
 	userLoginCtrl,
@@ -267,4 +377,8 @@ module.exports = {
 	updateUserPasswordCtrl,
 	followingUserCtrl,
 	unfollowUserCtrl,
+	blockUserCtrl,
+	unBlockUserCtrl,
+	generateVerificationTokenCtrl,
+	accountVerificationCrl,
 };
