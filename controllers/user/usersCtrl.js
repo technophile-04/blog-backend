@@ -5,6 +5,7 @@ const User = require('../../model/user/User');
 const generateToken = require('../../config/token/generateToken');
 const validateMongoDbId = require('../../utils/validateMongoDbId');
 const sgMail = require('@sendgrid/mail');
+const cloudinaryUploadImage = require('../../utils/cloudinary');
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
@@ -432,6 +433,28 @@ const passwrodResetCtrl = asyncHandler(async (req, res) => {
 	res.json('Password reset successful');
 });
 
+// -----------------------------------------------
+// Profile photo upload
+// -----------------------------------------------
+
+const profilePhotoUploadCtrl = asyncHandler(async (req, res) => {
+	const localPath = `public/images/profile/${req.file.filename}`;
+
+	const uploadedImg = await cloudinaryUploadImage(localPath);
+
+	const updatedUser = await User.findByIdAndUpdate(
+		req.user.id,
+		{
+			profilePhoto: uploadedImg.url,
+		},
+		{ new: true }
+	);
+
+	console.log(uploadedImg);
+
+	res.json(updatedUser);
+});
+
 module.exports = {
 	userRegisterCtrl,
 	userLoginCtrl,
@@ -449,4 +472,5 @@ module.exports = {
 	accountVerificationCrl,
 	forgotPasswordTokenCtrl,
 	passwrodResetCtrl,
+	profilePhotoUploadCtrl,
 };

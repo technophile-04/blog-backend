@@ -16,11 +16,16 @@ const {
 	accountVerificationCrl,
 	forgotPasswordTokenCtrl,
 	passwrodResetCtrl,
+	profilePhotoUploadCtrl,
 } = require('../../controllers/user/usersCtrl');
 
 const userRoutes = express.Router();
 
 const authMiddleware = require('../../middlewares/auth/authMiddleware');
+const {
+	profilePhotoUpload,
+	profilePhotoResize,
+} = require('../../middlewares/upload/profilePhotoUpload');
 
 // Register
 userRoutes.post('/register', userRegisterCtrl);
@@ -52,14 +57,20 @@ userRoutes.put('/unblock-user/:id', authMiddleware, unBlockUserCtrl);
 // verif account
 userRoutes.put('/verfiy-account', authMiddleware, accountVerificationCrl);
 
+// upload profile photo
+userRoutes.put(
+	'/profilephoto-upload',
+	authMiddleware,
+	profilePhotoUpload.single('image'),
+	profilePhotoResize,
+	profilePhotoUploadCtrl
+);
+
 // verif account
 userRoutes.post('/forgot-password-token', forgotPasswordTokenCtrl);
 
 // reset password account
 userRoutes.post('/reset-password', passwrodResetCtrl);
-
-// update user profile
-userRoutes.put('/:userId', authMiddleware, updateUserProfileCtrl);
 
 // send mail
 userRoutes.post(
@@ -73,5 +84,8 @@ userRoutes.get('/:userId', fetchUserDetailsCtrl);
 
 // Delete a user
 userRoutes.delete('/:userId', deleteUserCtrl);
+
+// update user profile
+userRoutes.put('/:userId', authMiddleware, updateUserProfileCtrl);
 
 module.exports = userRoutes;
