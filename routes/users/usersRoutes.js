@@ -14,6 +14,8 @@ const {
 	unBlockUserCtrl,
 	generateVerificationTokenCtrl,
 	accountVerificationCrl,
+	forgotPasswordTokenCtrl,
+	passwrodResetCtrl,
 } = require('../../controllers/user/usersCtrl');
 
 const userRoutes = express.Router();
@@ -49,6 +51,12 @@ userRoutes.put('/unblock-user/:id', authMiddleware, unBlockUserCtrl);
 
 // verif account
 userRoutes.put('/verfiy-account', authMiddleware, accountVerificationCrl);
+
+// verif account
+userRoutes.post('/forgot-password-token', forgotPasswordTokenCtrl);
+
+// reset password account
+userRoutes.post('/reset-password', passwrodResetCtrl);
 
 // update user profile
 userRoutes.put('/:userId', authMiddleware, updateUserProfileCtrl);

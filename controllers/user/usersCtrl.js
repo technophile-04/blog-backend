@@ -366,6 +366,72 @@ const accountVerificationCrl = asyncHandler(async (req, res) => {
 	res.json('Congrats you are now a verified user!');
 });
 
+// -----------------------------------------------
+// Forgot password token generatore
+// -----------------------------------------------
+
+const forgotPasswordTokenCtrl = asyncHandler(async (req, res) => {
+	const { email } = req.body;
+
+	const user = await User.findOne({ email });
+
+	if (!user) throw new 'NO user found'();
+
+	try {
+		const token = await user.createPasswordResetToken();
+
+		await user.save();
+
+		const resetUrl = `If you were requested to reset your password, reset now  it within 10 minutes, otherwise ignore this message <a href="http://localhost:3000/reset-password/${token}">Click here to reset password</a>`;
+
+		const msg = {
+			to: email,
+			from: 'shivbhonde34@gmail.com',
+			subject: 'Reset password',
+			html: resetUrl,
+		};
+
+		await sgMail.send(msg);
+
+		res.json({
+			message: `A verification message is send successfully to ${email}.Reset now within 10 min, ${resetUrl}`,
+		});
+	} catch (error) {
+		res.json({ message: error.message });
+	}
+
+	// res.json('See if its working');
+});
+
+// -----------------------------------------------
+// Password reset controller
+// -----------------------------------------------
+
+const passwrodResetCtrl = asyncHandler(async (req, res) => {
+	const { resetToken, password } = req.body;
+
+	const hashedToken = crypto
+		.createHash('sha256')
+		.update(resetToken)
+		.digest('hex');
+
+	const user = await User.findOne({
+		passwordRessetToken: hashedToken,
+		passwordResetExpires: { $gt: Date.now() },
+	});
+
+	if (!user) throw new Error('Token expired');
+
+	user.password = password;
+	user.passwordChangeAt = Date.now();
+	user.passwordRessetToken = undefined;
+	user.passwordResetExpires = undefined;
+
+	await user.save();
+
+	res.json('Password reset successful');
+});
+
 module.exports = {
 	userRegisterCtrl,
 	userLoginCtrl,
@@ -381,4 +447,6 @@ module.exports = {
 	unBlockUserCtrl,
 	generateVerificationTokenCtrl,
 	accountVerificationCrl,
+	forgotPasswordTokenCtrl,
+	passwrodResetCtrl,
 };
