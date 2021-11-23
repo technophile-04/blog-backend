@@ -23,9 +23,9 @@ const userRoutes = express.Router();
 
 const authMiddleware = require('../../middlewares/auth/authMiddleware');
 const {
-	profilePhotoUpload,
 	profilePhotoResize,
-} = require('../../middlewares/upload/profilePhotoUpload');
+	imageUpload,
+} = require('../../middlewares/upload/imageUpload');
 
 // Register
 userRoutes.post('/register', userRegisterCtrl);
@@ -61,7 +61,7 @@ userRoutes.put('/verfiy-account', authMiddleware, accountVerificationCrl);
 userRoutes.put(
 	'/profilephoto-upload',
 	authMiddleware,
-	profilePhotoUpload.single('image'),
+	imageUpload.single('image'),
 	profilePhotoResize,
 	profilePhotoUploadCtrl
 );

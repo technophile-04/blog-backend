@@ -1,4 +1,5 @@
 require('dotenv').config();
+const fs = require('fs');
 const asyncHandler = require('express-async-handler');
 const crypto = require('crypto');
 const User = require('../../model/user/User');
@@ -449,10 +450,10 @@ const profilePhotoUploadCtrl = asyncHandler(async (req, res) => {
 		},
 		{ new: true }
 	);
-
 	// console.log(uploadedImg);
-
 	res.json(updatedUser);
+
+	fs.unlinkSync(localPath);
 });
 
 module.exports = {
