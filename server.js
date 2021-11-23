@@ -3,6 +3,7 @@ const dotenv = require('dotenv');
 const morgan = require('morgan');
 const dbConnect = require('./config/db/dbConnect');
 const userRoutes = require('./routes/users/usersRoutes');
+const postRoutes = require('./routes/posts/postRoutes');
 const { errorHandler, notFound } = require('./middlewares/error/errorHandler');
 
 dotenv.config();
@@ -16,6 +17,7 @@ app.use(express.json());
 app.use(morgan('short'));
 
 app.use('/api/users', userRoutes);
+app.use('/api/posts', postRoutes);
 
 // error handler
 app.use(notFound);

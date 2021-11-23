@@ -450,7 +450,7 @@ const profilePhotoUploadCtrl = asyncHandler(async (req, res) => {
 		{ new: true }
 	);
 
-	console.log(uploadedImg);
+	// console.log(uploadedImg);
 
 	res.json(updatedUser);
 });
