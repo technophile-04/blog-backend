@@ -119,7 +119,7 @@ const fetchUserProfileCtrl = asyncHandler(async (req, res) => {
 	validateMongoDbId(profileId);
 
 	try {
-		const userProfile = await User.findById(profileId);
+		const userProfile = await User.findById(profileId).populate('posts');
 		res.json(userProfile);
 	} catch (error) {
 		res.json({ message: error.message });

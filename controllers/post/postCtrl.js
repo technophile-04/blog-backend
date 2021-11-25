@@ -5,8 +5,10 @@ const Filter = require('bad-words');
 const asyncHandler = require('express-async-handler');
 const validateMongoDbId = require('../../utils/validateMongoDbId');
 const cloudinaryUploadImage = require('../../utils/cloudinary');
-//  create post controller
 
+// ---------------------------------
+//  Create post
+// ---------------------------------
 const createPostCtrl = asyncHandler(async (req, res) => {
 	const { title, description } = req.body;
 	let imgUrl;
@@ -47,4 +49,16 @@ const createPostCtrl = asyncHandler(async (req, res) => {
 	}
 });
 
-module.exports = { createPostCtrl };
+// ---------------------------------
+//  Fetch all Post
+// ---------------------------------
+const fetchPostsCtrl = asyncHandler(async (req, res) => {
+	try {
+		const allPosts = await Post.find({}).populate('user');
+		res.json(allPosts);
+	} catch (error) {
+		res.json({ message: error.message });
+	}
+});
+
+module.exports = { createPostCtrl, fetchPostsCtrl };

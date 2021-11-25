@@ -102,6 +102,13 @@ const userSchema = new mongoose.Schema(
 	}
 );
 
+// Virtual method to populate created Posts
+userSchema.virtual('posts', {
+	ref: 'Post',
+	foreignField: 'user',
+	localField: '_id',
+});
+
 // To save the Hashed password we use middleware provided by mongoose and that dont use arrow function coz we want to reference the schema
 // Hashed password
 userSchema.pre('save', async function (next) {
