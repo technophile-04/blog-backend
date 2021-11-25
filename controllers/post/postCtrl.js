@@ -54,11 +54,85 @@ const createPostCtrl = asyncHandler(async (req, res) => {
 // ---------------------------------
 const fetchPostsCtrl = asyncHandler(async (req, res) => {
 	try {
-		const allPosts = await Post.find({}).populate('user');
+		const allPosts = await Post.find({});
 		res.json(allPosts);
 	} catch (error) {
 		res.json({ message: error.message });
 	}
 });
 
-module.exports = { createPostCtrl, fetchPostsCtrl };
+// ---------------------------------
+//  Fetch a Post
+// ---------------------------------
+const fetchPostCtrl = asyncHandler(async (req, res) => {
+	const { postId } = req.params;
+
+	validateMongoDbId(postId);
+
+	try {
+		await Post.findById(postId).populate('user');
+
+		const UpdatedPost = await Post.findByIdAndUpdate(
+			postId,
+			{
+				$inc: { numViews: 1 },
+			},
+			{ new: true }
+		);
+
+		res.json(UpdatedPost);
+	} catch (error) {
+		res.json({ message: error.message });
+	}
+
+	// res.json(postId);
+});
+
+// ---------------------------------
+//  Update a post
+// ---------------------------------
+
+const updatePostCtrl = asyncHandler(async (req, res) => {
+	const { postId } = req.params;
+	validateMongoDbId(postId);
+
+	try {
+		const updatedPost = await Post.findByIdAndUpdate(
+			postId,
+			{
+				...req.body,
+				user: req.user.id,
+			},
+			{ new: true }
+		);
+
+		res.json(updatedPost);
+	} catch (error) {
+		res.json({ message: error.message });
+	}
+});
+
+// ---------------------------------
+//  Delete a Post
+// ---------------------------------
+
+const deletePostCtrl = asyncHandler(async (req, res) => {
+	const { postId } = req.params;
+	validateMongoDbId(postId);
+
+	try {
+		await Post.findByIdAndDelete(postId);
+
+		res.json({ message: 'Post deleted successfully' });
+	} catch (error) {
+		res.json({ message: error.message });
+	}
+});
+
+module.exports = {
+	createPostCtrl,
+	fetchPostsCtrl,
+	fetchPostCtrl,
+	updatePostCtrl,
+	deletePostCtrl,
+};
