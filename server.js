@@ -5,6 +5,7 @@ const dbConnect = require('./config/db/dbConnect');
 const userRoutes = require('./routes/users/usersRoutes');
 const postRoutes = require('./routes/posts/postRoutes');
 const { errorHandler, notFound } = require('./middlewares/error/errorHandler');
+const commentRoutes = require('./routes/comments/commentRoutes');
 
 dotenv.config();
 
@@ -18,6 +19,7 @@ app.use(morgan('short'));
 
 app.use('/api/users', userRoutes);
 app.use('/api/posts', postRoutes);
+app.use('/api/comments', commentRoutes);
 
 // error handler
 app.use(notFound);
