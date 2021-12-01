@@ -80,9 +80,27 @@ const updateCommentCtrl = asyncHandler(async (req, res) => {
 	}
 });
 
+// ---------------------------------
+//  Delete a comment
+// ---------------------------------
+
+const deleteCommentCtrl = asyncHandler(async (req, res) => {
+	const { commentId } = req.params;
+
+	validateMongoDbId(commentId);
+
+	try {
+		await Comment.findByIdAndDelete(commentId);
+		res.json('Comment deleted successfully!');
+	} catch (error) {
+		res.json({ error: error.message });
+	}
+});
+
 module.exports = {
 	createCommentCtrl,
 	fetchAllCommentsCtrl,
 	fetchCommentCtrl,
 	updateCommentCtrl,
+	deleteCommentCtrl,
 };
