@@ -30,7 +30,7 @@ const createCommentCtrl = asyncHandler(async (req, res) => {
 
 const fetchAllCommentsCtrl = asyncHandler(async (req, res) => {
 	try {
-		const comments = await Comment.find({}).sort('-created');
+		const comments = await Comment.find({}).sort('-createdAt');
 		res.json(comments);
 	} catch (error) {
 		res.json({ message: error.message });
