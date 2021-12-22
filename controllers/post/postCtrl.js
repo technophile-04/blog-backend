@@ -10,7 +10,7 @@ const cloudinaryUploadImage = require('../../utils/cloudinary');
 //  Create post
 // ---------------------------------
 const createPostCtrl = asyncHandler(async (req, res) => {
-	const { title, description } = req.body;
+	const { title, description, category } = req.body;
 	let imgUrl;
 	const user = req.user.id;
 	const filter = new Filter();
@@ -40,6 +40,7 @@ const createPostCtrl = asyncHandler(async (req, res) => {
 			title,
 			description,
 			user,
+			category,
 			image: imgUrl && imgUrl,
 		});
 
