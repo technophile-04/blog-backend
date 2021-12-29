@@ -154,7 +154,9 @@ const toggleAddLikeToPostCtrl = asyncHandler(async (req, res) => {
 
 	const loginUserId = req?.user?.id;
 
-	const isLiked = post?.isLiked;
+	const isAlreadyLike = post.likes?.find(
+		(userId) => userId.toString() === loginUserId.toString()
+	);
 
 	const isAlreadyDisLiked = post.dislikes.find(
 		(userId) => userId.toString() === loginUserId.toString()
@@ -165,18 +167,15 @@ const toggleAddLikeToPostCtrl = asyncHandler(async (req, res) => {
 			postId,
 			{
 				$pull: { dislikes: loginUserId },
-				isDisLiked: false,
 			},
 			{ new: true }
 		);
 
 		res.json(updatedPost);
-	}
-
-	if (isLiked) {
+	} else if (isAlreadyLike) {
 		const updatedPost = await Post.findByIdAndUpdate(
 			postId,
-			{ $pull: { likes: loginUserId }, isLiked: false },
+			{ $pull: { likes: loginUserId } },
 			{ new: true }
 		);
 
@@ -184,7 +183,7 @@ const toggleAddLikeToPostCtrl = asyncHandler(async (req, res) => {
 	} else {
 		const updatedPost = await Post.findByIdAndUpdate(
 			postId,
-			{ $push: { likes: loginUserId }, isLiked: true },
+			{ $push: { likes: loginUserId } },
 			{ new: true }
 		);
 		res.json(updatedPost);
@@ -202,32 +201,32 @@ const toggleAddDislikeToPostCtrl = asyncHandler(async (req, res) => {
 
 	const post = await Post.findById(postId);
 
-	const isDisLiked = post.isDisLiked;
-
 	const isAlreadyLike = post.likes?.find(
+		(userId) => userId.toString() === loginUserId.toString()
+	);
+
+	const isAlreadyDisLiked = post.dislikes.find(
 		(userId) => userId.toString() === loginUserId.toString()
 	);
 
 	if (isAlreadyLike) {
 		const updatedPost = await Post.findByIdAndUpdate(
 			postId,
-			{ $pull: { likes: loginUserId }, isLiked: false },
+			{ $pull: { likes: loginUserId } },
 			{ new: true }
 		);
 		res.json(updatedPost);
-	}
-
-	if (isDisLiked) {
+	} else if (isAlreadyDisLiked) {
 		const updatedPost = await Post.findByIdAndUpdate(
 			postId,
-			{ $pull: { dislikes: loginUserId }, isDisLiked: false },
+			{ $pull: { dislikes: loginUserId } },
 			{ new: true }
 		);
 		res.json(updatedPost);
 	} else {
 		const updatedPost = await Post.findByIdAndUpdate(
 			postId,
-			{ $push: { dislikes: loginUserId }, isDisLiked: true },
+			{ $push: { dislikes: loginUserId } },
 			{ new: true }
 		);
 		res.json(updatedPost);

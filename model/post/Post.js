@@ -12,14 +12,6 @@ const postSchema = new mongoose.Schema(
 			type: String,
 			required: [true, 'Category of post is required'],
 		},
-		isLiked: {
-			type: Boolean,
-			default: false,
-		},
-		isDisLiked: {
-			type: Boolean,
-			default: false,
-		},
 		likes: [
 			{
 				type: mongoose.Schema.Types.ObjectId,
