@@ -84,7 +84,8 @@ const fetchPostCtrl = asyncHandler(async (req, res) => {
 		const post = await Post.findById(postId)
 			.populate('user')
 			.populate('dislikes')
-			.populate('likes');
+			.populate('likes')
+			.populate('comments');
 
 		await Post.findByIdAndUpdate(
 			postId,
@@ -139,7 +140,7 @@ const deletePostCtrl = asyncHandler(async (req, res) => {
 
 		res.json({ message: 'Post deleted successfully' });
 	} catch (error) {
-		res.json({ message: error.message });
+		res.json({ message: error?.message });
 	}
 });
 

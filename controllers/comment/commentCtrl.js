@@ -67,7 +67,6 @@ const updateCommentCtrl = asyncHandler(async (req, res) => {
 		const updateComment = await Comment.findByIdAndUpdate(
 			commentId,
 			{
-				post: postId,
 				description,
 				user,
 			},
@@ -90,8 +89,8 @@ const deleteCommentCtrl = asyncHandler(async (req, res) => {
 	validateMongoDbId(commentId);
 
 	try {
-		await Comment.findByIdAndDelete(commentId);
-		res.json('Comment deleted successfully!');
+		const comment = await Comment.findByIdAndDelete(commentId);
+		res.json(comment);
 	} catch (error) {
 		res.json({ error: error.message });
 	}
