@@ -54,6 +54,7 @@ const userLoginCtrl = asyncHandler(async (req, res) => {
 		firstName: user?.firstName,
 		lastName: user?.lastName,
 		email: user?.email,
+		bio: user?.bio,
 		profilePhoto: user?.profilePhoto,
 		isAdmin: user?.isAdmin,
 		token: generateToken(user?._id),
@@ -131,8 +132,6 @@ const fetchUserProfileCtrl = asyncHandler(async (req, res) => {
 // -----------------------------------------------
 
 const updateUserProfileCtrl = asyncHandler(async (req, res) => {
-	// const { userId } = req.params;
-
 	const { _id } = req?.user;
 
 	validateMongoDbId(_id);
@@ -156,11 +155,6 @@ const updateUserProfileCtrl = asyncHandler(async (req, res) => {
 	} catch (error) {
 		res.json({ message: error.message });
 	}
-
-	/*
-		1)get the id from params
-		2)validate id with the user set on req
-	 */
 });
 
 // -----------------------------------------------

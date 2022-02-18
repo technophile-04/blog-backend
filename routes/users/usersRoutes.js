@@ -86,6 +86,6 @@ userRoutes.get('/:userId', fetchUserDetailsCtrl);
 userRoutes.delete('/:userId', deleteUserCtrl);
 
 // update user profile
-userRoutes.put('/:userId', authMiddleware, updateUserProfileCtrl);
+userRoutes.put('/', authMiddleware, updateUserProfileCtrl);
 
 module.exports = userRoutes;
