@@ -197,7 +197,7 @@ const followingUserCtrl = asyncHandler(async (req, res) => {
 		if (isAlreadyFollowed)
 			throw new Error('You are already following this user');
 
-		await User.findByIdAndUpdate(
+		const updatedUser = await User.findByIdAndUpdate(
 			followId,
 			{
 				$push: { followers: id },
@@ -205,7 +205,7 @@ const followingUserCtrl = asyncHandler(async (req, res) => {
 			{
 				new: true,
 			}
-		);
+		).populate('posts');
 
 		await User.findByIdAndUpdate(
 			id,
@@ -218,21 +218,21 @@ const followingUserCtrl = asyncHandler(async (req, res) => {
 			}
 		);
 
-		res.json('You have successfully followed this user!');
+		res.json(updatedUser);
 	} catch (error) {
 		res.json({ message: error.message });
 	}
 });
 
 // -----------------------------------------------
-// Follow a user
+// Unfollow a user
 // -----------------------------------------------
 const unfollowUserCtrl = asyncHandler(async (req, res) => {
 	const { unfollowId } = req.body;
 	const { id } = req.user;
 
 	try {
-		await User.findByIdAndUpdate(
+		const updatedUser = await User.findByIdAndUpdate(
 			unfollowId,
 			{
 				$pull: { followers: id },
@@ -240,7 +240,7 @@ const unfollowUserCtrl = asyncHandler(async (req, res) => {
 			{
 				new: true,
 			}
-		);
+		).populate('posts');
 
 		await User.findByIdAndUpdate(
 			id,
@@ -251,7 +251,7 @@ const unfollowUserCtrl = asyncHandler(async (req, res) => {
 			{ new: true }
 		);
 
-		res.json('You have successfully unfollowed this user');
+		res.json(updatedUser);
 	} catch (error) {
 		res.json({ message: error.message });
 	}
