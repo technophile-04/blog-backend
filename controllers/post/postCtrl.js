@@ -58,13 +58,14 @@ const fetchPostsCtrl = asyncHandler(async (req, res) => {
 		const { category } = req.query;
 
 		if (category) {
-			const allPosts = await Post.find({ category: category }).populate(
-				'user',
-				'-password'
-			);
+			const allPosts = await Post.find({ category: category })
+				.populate('user', '-password')
+				.sort('-createdAt');
 			res.json(allPosts);
 		} else {
-			const allPosts = await Post.find({}).populate('user', '-password');
+			const allPosts = await Post.find({})
+				.populate('user', '-password')
+				.sort('-createdAt');
 			res.json(allPosts);
 		}
 	} catch (error) {

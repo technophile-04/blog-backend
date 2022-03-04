@@ -57,6 +57,7 @@ const userLoginCtrl = asyncHandler(async (req, res) => {
 		bio: user?.bio,
 		profilePhoto: user?.profilePhoto,
 		isAdmin: user?.isAdmin,
+		isAccountVerified: user?.isAccountVerified,
 		token: generateToken(user?._id),
 	});
 });
@@ -67,7 +68,7 @@ const userLoginCtrl = asyncHandler(async (req, res) => {
 
 const fetchAllUsersCtrl = asyncHandler(async (req, res) => {
 	try {
-		const users = await User.find({});
+		const users = await User.find({}).populate('posts');
 		res.json(users);
 	} catch (error) {
 		res.json({ message: error.message });
@@ -116,12 +117,34 @@ const fetchUserDetailsCtrl = asyncHandler(async (req, res) => {
 
 const fetchUserProfileCtrl = asyncHandler(async (req, res) => {
 	const { profileId } = req.params;
-
+	const loginUserId = req?.user?._id.toString();
 	validateMongoDbId(profileId);
 
 	try {
-		const userProfile = await User.findById(profileId).populate('posts');
-		res.json(userProfile);
+		const userProfile = await User.findById(profileId)
+			.populate('posts')
+			.populate('viewedBy');
+		const alreadyExist = userProfile.viewedBy?.find((user) => {
+			return user?._id?.toString() === loginUserId;
+		});
+
+		console.log(alreadyExist);
+
+		if (alreadyExist || profileId === loginUserId) {
+			res.json(userProfile);
+			return;
+		} else {
+			const updatedProfile = await User.findByIdAndUpdate(
+				profileId,
+				{
+					$push: { viewedBy: loginUserId },
+				},
+				{
+					new: true,
+				}
+			);
+			res.json(updatedProfile);
+		}
 	} catch (error) {
 		res.json({ message: error.message });
 	}
@@ -322,9 +345,9 @@ const generateVerificationTokenCtrl = asyncHandler(async (req, res) => {
 		const resetUrl = `If you were requested to verify your account, verify it within 10 minutes, otherwise ignore this message <a href="http://localhost:3000/verify-token/${verificationToken}">Click here to verify</a>`;
 
 		const msg = {
-			to: 'shivbhonde04@gmail.com',
+			to: user?.email,
 			from: 'shivbhonde34@gmail.com',
-			subject: 'My first nodejs email sending',
+			subject: 'Blog App verification',
 			html: resetUrl,
 		};
 
@@ -339,27 +362,31 @@ const generateVerificationTokenCtrl = asyncHandler(async (req, res) => {
 // Account Verification
 // -----------------------------------------------
 
-const accountVerificationCrl = asyncHandler(async (req, res) => {
-	const { verificationToken } = req.body;
-	const hashedToken = crypto
-		.createHash('sha256')
-		.update(verificationToken)
-		.digest('hex');
+const accountVerificationCrl = asyncHandler(async (req, res, next) => {
+	try {
+		const { verificationToken } = req.body;
+		const hashedToken = crypto
+			.createHash('sha256')
+			.update(verificationToken)
+			.digest('hex');
 
-	const userFound = await User.findOne({
-		accountVerificationToken: hashedToken,
-		accountVerificationTokenExpires: { $gt: Date.now() },
-	});
+		const userFound = await User.findOne({
+			accountVerificationToken: hashedToken,
+			accountVerificationTokenExpires: { $gt: Date.now() },
+		});
 
-	if (!userFound) throw new Error('Token is expired, please try again!');
+		if (!userFound) throw new Error('Token is expired, please try again!');
 
-	userFound.isAccountVerified = true;
-	userFound.accountVerificationToken = undefined;
-	userFound.accountVerificationTokenExpires = undefined;
+		userFound.isAccountVerified = true;
+		userFound.accountVerificationToken = undefined;
+		userFound.accountVerificationTokenExpires = undefined;
 
-	await userFound.save();
+		await userFound.save();
 
-	res.json('Congrats you are now a verified user!');
+		res.json('Congrats you are now a verified user!');
+	} catch (error) {
+		next(error);
+	}
 });
 
 // -----------------------------------------------

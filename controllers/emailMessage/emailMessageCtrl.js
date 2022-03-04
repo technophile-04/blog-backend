@@ -27,8 +27,8 @@ const sendEmailMessageCtrl = asyncHandler(async (req, res) => {
 
 		await EmailMessage.create({
 			sentBy: req.user?._id,
-			from: req.user?.email,
-			to,
+			fromEmail: req.user?.email,
+			toEmail: to,
 			subject,
 			message,
 		});

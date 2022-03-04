@@ -110,6 +110,15 @@ userSchema.virtual('posts', {
 	localField: '_id',
 });
 
+userSchema.virtual('accountType').get(function () {
+	const totalFollowers = this.followers?.length;
+	if (totalFollowers < 3) {
+		return 'Starter Account';
+	} else {
+		return 'Pro Account';
+	}
+});
+
 // To save the Hashed password we use middleware provided by mongoose and that dont use arrow function coz we want to reference the schema
 // Hashed password
 userSchema.pre('save', async function (next) {
