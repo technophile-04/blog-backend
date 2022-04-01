@@ -35,6 +35,11 @@ const createPostCtrl = asyncHandler(async (req, res) => {
 		fs.unlinkSync(localPath);
 	}
 
+	console.log(req.user);
+	if (req.user.accountType === 'Starter Account' && req.user?.postCount >= 2) {
+		throw new Error('Starter Account can only create 2 posts!');
+	}
+
 	try {
 		const post = await Post.create({
 			title,
@@ -43,6 +48,12 @@ const createPostCtrl = asyncHandler(async (req, res) => {
 			category,
 			image: imgUrl && imgUrl,
 		});
+
+		await User.findByIdAndUpdate(
+			user,
+			{ $inc: { postCount: 1 } },
+			{ new: true }
+		);
 
 		res.json(post);
 	} catch (error) {

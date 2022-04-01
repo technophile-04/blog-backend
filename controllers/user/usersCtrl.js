@@ -68,7 +68,7 @@ const userLoginCtrl = asyncHandler(async (req, res) => {
 
 const fetchAllUsersCtrl = asyncHandler(async (req, res) => {
 	try {
-		const users = await User.find({}).populate('posts');
+		const users = await User.find({}).select(['-password']).populate('posts');
 		res.json(users);
 	} catch (error) {
 		res.json({ message: error.message });

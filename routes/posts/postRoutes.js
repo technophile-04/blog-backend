@@ -9,6 +9,7 @@ const {
 	toggleAddDislikeToPostCtrl,
 } = require('../../controllers/post/postCtrl');
 const authMiddleware = require('../../middlewares/auth/authMiddleware');
+const handleBlockedUser = require('../../middlewares/auth/handleBlockedUser');
 const {
 	imageUpload,
 	postImageResize,
@@ -18,14 +19,25 @@ const postRoutes = express.Router();
 postRoutes.post(
 	'/',
 	authMiddleware,
+	handleBlockedUser,
 	imageUpload.single('image'),
 	postImageResize,
 	createPostCtrl
 );
 
 postRoutes.get('/', fetchPostsCtrl);
-postRoutes.put('/likes', authMiddleware, toggleAddLikeToPostCtrl);
-postRoutes.put('/dislikes', authMiddleware, toggleAddDislikeToPostCtrl);
+postRoutes.put(
+	'/likes',
+	authMiddleware,
+	handleBlockedUser,
+	toggleAddLikeToPostCtrl
+);
+postRoutes.put(
+	'/dislikes',
+	authMiddleware,
+	handleBlockedUser,
+	toggleAddDislikeToPostCtrl
+);
 postRoutes.get('/:postId', fetchPostCtrl);
 postRoutes.put('/:postId', authMiddleware, updatePostCtrl);
 postRoutes.delete('/:postId', authMiddleware, deletePostCtrl);
