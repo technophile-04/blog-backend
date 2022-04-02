@@ -398,7 +398,7 @@ const forgotPasswordTokenCtrl = asyncHandler(async (req, res) => {
 
 	const user = await User.findOne({ email });
 
-	if (!user) throw new 'NO user found'();
+	if (!user) throw new Error('No user found');
 
 	try {
 		const token = await user.createPasswordResetToken();
@@ -417,7 +417,7 @@ const forgotPasswordTokenCtrl = asyncHandler(async (req, res) => {
 		await sgMail.send(msg);
 
 		res.json({
-			message: `A verification message is send successfully to ${email}.Reset now within 10 min, ${resetUrl}`,
+			message: `A verification message is send successfully to ${email}.Reset now within 10 min`,
 		});
 	} catch (error) {
 		res.json({ message: error.message });
