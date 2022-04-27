@@ -145,10 +145,20 @@ const updatePostCtrl = asyncHandler(async (req, res) => {
 
 const deletePostCtrl = asyncHandler(async (req, res) => {
 	const { postId } = req.params;
+	const userId = req.user.id;
 	validateMongoDbId(postId);
+	validateMongoDbId(userId);
 
 	try {
 		await Post.findByIdAndDelete(postId);
+
+		await User.findByIdAndUpdate(
+			userId,
+			{
+				$inc: { postCount: -1 },
+			},
+			{ new: true }
+		);
 
 		res.json({ message: 'Post deleted successfully' });
 	} catch (error) {

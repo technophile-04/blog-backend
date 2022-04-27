@@ -123,7 +123,8 @@ const fetchUserProfileCtrl = asyncHandler(async (req, res) => {
 	try {
 		const userProfile = await User.findById(profileId)
 			.populate('posts')
-			.populate('viewedBy');
+			.populate('viewedBy')
+			.select(['-password']);
 		const alreadyExist = userProfile.viewedBy?.find((user) => {
 			return user?._id?.toString() === loginUserId;
 		});
