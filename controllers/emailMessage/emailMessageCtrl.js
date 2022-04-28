@@ -13,7 +13,7 @@ const sendEmailMessageCtrl = asyncHandler(async (req, res) => {
 	const isProfane = filter.isProfane(emailMessage);
 
 	if (isProfane)
-		throw new Error('Email sent failed because it contains profane workds');
+		throw new Error('Email sent failed because it contains profane words');
 
 	try {
 		const msg = {
