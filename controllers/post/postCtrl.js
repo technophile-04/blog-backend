@@ -14,8 +14,8 @@ const createPostCtrl = asyncHandler(async (req, res) => {
 	let imgUrl;
 	const user = req.user.id;
 	const filter = new Filter();
-
-	const isBadWordsPresent = filter.isProfane(title, description);
+	const postContent = title + ' ' + description + ' ';
+	const isBadWordsPresent = filter.isProfane(postContent);
 
 	if (isBadWordsPresent) {
 		await User.findByIdAndUpdate(req.user.id, {
