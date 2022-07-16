@@ -1,1 +1,3 @@
-[] Exclude passowrd while fetching users from all user controllers
+## TODO :
+
+- [x] Exclude password while fetching users from all user controllers
